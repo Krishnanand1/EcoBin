@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WasteVision | Waste classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main class="shell">
+        <section class="hero" aria-labelledby="page-title">
+            <p class="eyebrow">WasteVision</p>
+            <h1 id="page-title">Sort waste with confidence.</h1>
+            <p class="intro">Upload one clear photo and we’ll identify its most likely material category.</p>
+        </section>
+        {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+        <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data" id="upload-form">
+            <label class="drop-zone" id="drop-zone" for="file">
+                <input type="file" name="file" id="file" accept="image/png,image/jpeg" required>
+                <span class="upload-icon" aria-hidden="true">↑</span>
+                <span class="upload-title">Drop an image here or choose a file</span>
+                <span class="upload-hint">PNG or JPG · maximum 8 MB</span>
+                <img id="preview" alt="Selected image preview" hidden>
+            </label>
+            <p id="file-name" class="file-name" aria-live="polite">No image selected</p>
+            <button type="submit" id="submit-button">Classify image</button>
+        </form>
+        <section class="categories" aria-labelledby="categories-title">
+            <h2 id="categories-title">Recognises</h2>
+            <ul><li>Cardboard</li><li>Glass</li><li>Metal</li><li>Paper</li><li>Plastic</li><li>Trash</li></ul>
+        </section>
+    </main>
+    <script>
+        const zone = document.getElementById('drop-zone'), input = document.getElementById('file');
+        const nameText = document.getElementById('file-name'), preview = document.getElementById('preview');
+        const form = document.getElementById('upload-form'), button = document.getElementById('submit-button');
+        function selectFile(file) { if (!file) return; nameText.textContent = file.name; if (file.type.startsWith('image/')) { preview.src = URL.createObjectURL(file); preview.hidden = false; } }
+        input.addEventListener('change', () => selectFile(input.files[0]));
+        ['dragenter', 'dragover'].forEach(event => zone.addEventListener(event, e => { e.preventDefault(); zone.classList.add('drag-over'); }));
+        ['dragleave', 'drop'].forEach(event => zone.addEventListener(event, e => { e.preventDefault(); zone.classList.remove('drag-over'); }));
+        zone.addEventListener('drop', event => { input.files = event.dataTransfer.files; selectFile(input.files[0]); });
+        form.addEventListener('submit', () => { button.disabled = true; button.textContent = 'Classifying…'; });
+    </script>
+</body>
+</html>

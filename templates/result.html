@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WasteVision | Result</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main class="shell">
+        <p class="eyebrow">WasteVision</p><h1>Your classification</h1>
+        <section class="result-card">
+            <img class="result-image" src="{{ url_for('static', filename=image_url) }}" alt="Uploaded waste item">
+            <div><p class="muted">Most likely material</p><h2 class="category">{{ prediction.category }}</h2><p class="confidence">{{ prediction.confidence }}% confidence</p>
+            {% if prediction.confidence < 60 %}<p class="notice">Low confidence—try a brighter, closer photo with one item in frame.</p>{% endif %}</div>
+        </section>
+        <section class="advice" aria-labelledby="advice-title"><h2 id="advice-title">Before you dispose of it</h2><p>Empty and clean the item where possible, then follow your local recycling rules. Contamination can make otherwise recyclable material unusable.</p><p class="muted">Other possibilities: {% for item in prediction.alternatives %}{{ item.category }} ({{ item.confidence }}%){% if not loop.last %}, {% endif %}{% endfor %}</p></section>
+        <a class="button-link" href="{{ url_for('home') }}">Classify another image</a>
+    </main>
+</body>
+</html>
